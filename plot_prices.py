@@ -1,8 +1,14 @@
 import loadData
 import numpy as np
+import matplotlib.pyplot as plt
 
-extracted_data = loadData.extractData('candidate-home-task-1.2.0/data_test.json')
-assets_timeline = extracted_data.get_rows()
+
+def prepare_data(file = 'candidate-home-task-1.2.0/data.json'):
+    data_file = file
+
+    assets_data = loadData.ExtractData(data_file)
+
+    return assets_data
 
 
 def get_asset_effective_price(ask, bid):
@@ -11,19 +17,28 @@ def get_asset_effective_price(ask, bid):
 
 def evaluate_effictive(item):
     return get_asset_effective_price(item['ask'], item['bid'])
-vee = np.vectorize(evaluate_effictive)
+
+
+def plot_data(assets_data):
+    vee = np.vectorize(evaluate_effictive)
+    assets_timeline = assets_data.get_rows()
+    all_prices = []
+
+    for timeline in assets_timeline:
+        asset_avg_prices = timeline
+        asset_avg_prices = vee(asset_avg_prices)
+        all_prices.append(asset_avg_prices)
+    time_stamps = loadData.ExtractData.normalize_times(assets_data.get_columns_names())
+    plt.plot(time_stamps, all_prices[0], time_stamps, all_prices[1])
+    plt.show()
+
+
+def plot_prices():
+    assets_data = prepare_data()
+
+    plot_data(assets_data)
 
 
 
-all_prices = []
-for timeline in assets_timeline:
-    asset_avg_prices = timeline
-    asset_avg_prices = vee(asset_avg_prices)
-    # for record in timeline:
-    #     effective_price = get_asset_effective_price(record['ask'], record['bid'])
-    #     asset_avg_prices.append(effective_price)
-    all_prices.append(asset_avg_prices)
-
-print(np.array(all_prices))
 
 
